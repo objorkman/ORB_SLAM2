@@ -51,7 +51,7 @@ int main(int argc, char **argv)
     int nImages = vstrImageFilenames.size();
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::MONOCULAR,true);
+    ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::MONOCULAR,false);
 
     // Vector for tracking time statistics
     vector<float> vTimesTrack;
@@ -92,7 +92,7 @@ int main(int argc, char **argv)
 #endif
 
         double ttrack= std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-
+	cout << ni << " " << ttrack << endl;
         vTimesTrack[ni]=ttrack;
 
         // Wait to load the next frame
@@ -106,9 +106,6 @@ int main(int argc, char **argv)
             usleep((T-ttrack)*1e6);
     }
 
-    // Stop all threads
-    SLAM.Shutdown();
-
     // Tracking time statistics
     sort(vTimesTrack.begin(),vTimesTrack.end());
     float totaltime = 0;
@@ -117,11 +114,18 @@ int main(int argc, char **argv)
         totaltime+=vTimesTrack[ni];
     }
     cout << "-------" << endl << endl;
-    cout << "median tracking time: " << vTimesTrack[nImages/2] << endl;
     cout << "mean tracking time: " << totaltime/nImages << endl;
+    cout << "25th percentile tracking time: " << vTimesTrack[nImages/4] << endl;
+    cout << "50th percentile tracking time: " << vTimesTrack[nImages/2] << endl;
+    cout << "75th percentile tracking time: " << vTimesTrack[nImages/4 + nImages/2] << endl;
+    cout << "95th percentile tracking time: " << vTimesTrack[nImages - nImages / 20] << endl;
+    cout << "99th percentile tracking time: " << vTimesTrack[nImages - nImages / 100] << endl;
+
+    // Stop all threads
+    SLAM.Shutdown();
 
     // Save camera trajectory
-    SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
+    // SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
 
     return 0;
 }

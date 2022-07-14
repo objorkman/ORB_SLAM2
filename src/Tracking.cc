@@ -769,7 +769,6 @@ void Tracking::CreateInitialMapMonocular()
             pMP->SetWorldPos(pMP->GetWorldPos()*invMedianDepth);
         }
     }
-
     mpLocalMapper->InsertKeyFrame(pKFini);
     mpLocalMapper->InsertKeyFrame(pKFcur);
 
